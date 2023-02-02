@@ -74,8 +74,16 @@ const Board = () => {
 
       if (socketService.socket) {
         gameService.updateGame(socketService.socket, newBoard);
+
+        if (winning(newBoard)) {
+          gameService.gameWon(socketService.socket, "You lost!");
+          alert("You won!");
+        } else if (emptyIndexies(newBoard).length === 0) {
+          gameService.gameWon(socketService.socket, "The game is a TIE!");
+          alert("The game is a TIE! update game");
+        }
+
         dispatch(setIsMyTurn(false));
-        winning(newBoard);
       }
     }
   };
@@ -89,8 +97,18 @@ const Board = () => {
       });
   };
 
+  const handleGameWon = () => {
+    if (socketService.socket) {
+      gameService.onGameWon(socketService.socket, (message) => {
+        dispatch(setIsMyTurn(false));
+        alert(message);
+      });
+    }
+  };
+
   useEffect(() => {
     handleGameUpdate();
+    handleGameWon();
   }, []);
 
   return (

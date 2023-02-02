@@ -17,6 +17,7 @@ const WelcomePage = () => {
 
     try {
       await gameService.JoinRoom(socket, roomPassword);
+      //   localStorage.setItem("roomPassword", roomPassword);
       setLoading(false);
       navigate("/board");
     } catch (err) {
