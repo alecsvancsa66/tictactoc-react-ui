@@ -1,10 +1,19 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Box, Grid } from "@mui/material";
 
 import Square from "./Square";
+import gameService from "../services/gameService";
+import socketService from "../services/socketService";
+import { TBoard } from "../models/room";
+import { useAppDispatch, useAppSelector } from "../store";
+import { selectRoom } from "../store/selectors/room";
+import { setIsMyTurn } from "../store/reducers/room";
 
 const Board = () => {
-  const [board, setBoard] = useState([
+  const dispatch = useAppDispatch();
+  const { playerSymbol } = useAppSelector(selectRoom);
+
+  const [board, setBoard] = useState<TBoard>([
     { value: "" },
     { value: "" },
     { value: "" },
@@ -16,7 +25,44 @@ const Board = () => {
     { value: "" },
   ]);
 
-  console.log(board);
+  // returns list of the indexes of empty spots on the board
+  const emptyIndexies = (board: TBoard) => {
+    return board.filter((square) => square.value === "");
+  };
+
+  // winning combinations using the board indexies
+  const winning = (board: TBoard) => {
+    if (
+      (board[0].value === playerSymbol &&
+        board[1].value === playerSymbol &&
+        board[2].value === playerSymbol) ||
+      (board[3].value === playerSymbol &&
+        board[4].value === playerSymbol &&
+        board[5].value === playerSymbol) ||
+      (board[6].value === playerSymbol &&
+        board[7].value === playerSymbol &&
+        board[8].value === playerSymbol) ||
+      (board[0].value === playerSymbol &&
+        board[3].value === playerSymbol &&
+        board[6].value === playerSymbol) ||
+      (board[1].value === playerSymbol &&
+        board[4].value === playerSymbol &&
+        board[7].value === playerSymbol) ||
+      (board[2].value === playerSymbol &&
+        board[5].value === playerSymbol &&
+        board[8].value === playerSymbol) ||
+      (board[0].value === playerSymbol &&
+        board[4].value === playerSymbol &&
+        board[8].value === playerSymbol) ||
+      (board[2].value === playerSymbol &&
+        board[4].value === playerSymbol &&
+        board[6].value === playerSymbol)
+    ) {
+      return true;
+    } else {
+      return false;
+    }
+  };
 
   const updateGame = (value: "x" | "o", index: number) => {
     // if the square is empty only then update the board
@@ -25,8 +71,27 @@ const Board = () => {
 
       newBoard.splice(index, 1, { value });
       setBoard(newBoard);
+
+      if (socketService.socket) {
+        gameService.updateGame(socketService.socket, newBoard);
+        dispatch(setIsMyTurn(false));
+        winning(newBoard);
+      }
     }
   };
+
+  const handleGameUpdate = () => {
+    if (socketService.socket)
+      gameService.onGameUpdate(socketService.socket, (newBoard) => {
+        setBoard(newBoard);
+        dispatch(setIsMyTurn(true));
+        winning(newBoard);
+      });
+  };
+
+  useEffect(() => {
+    handleGameUpdate();
+  }, []);
 
   return (
     <Box>

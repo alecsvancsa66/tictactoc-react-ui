@@ -10,15 +10,21 @@ interface ISquare {
 }
 
 const Square = ({ value, onSquareClick, index }: ISquare) => {
-  const { playerSymbol } = useAppSelector(selectRoom);
+  const { playerSymbol, isMyTurn } = useAppSelector(selectRoom);
 
   return (
     <>
       {playerSymbol ? (
         <Button
           variant="outlined"
-          sx={{ height: "100%", width: "100%", borderRadius: "8px" }}
-          onClick={() => onSquareClick(playerSymbol, index)}
+          sx={{
+            height: "100%",
+            width: "100%",
+            borderRadius: "8px",
+          }}
+          onClick={
+            isMyTurn ? () => onSquareClick(playerSymbol, index) : () => null
+          }
         >
           {value}
         </Button>
