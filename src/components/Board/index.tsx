@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
-import { Box, Grid } from "@mui/material";
+import { Grid } from "@mui/material";
 
-import Square from "./Square";
-import gameService from "../services/gameService";
-import socketService from "../services/socketService";
-import { TBoard } from "../models/room";
-import { useAppDispatch, useAppSelector } from "../store";
-import { selectRoom } from "../store/selectors/room";
-import { setIsMyTurn } from "../store/reducers/room";
+import Square from "../Square";
+import gameService from "../../services/gameService";
+import socketService from "../../services/socketService";
+import { TBoard } from "../../models/room";
+import { useAppDispatch, useAppSelector } from "../../store";
+import { selectRoom } from "../../store/selectors/room";
+import { setIsGameStarted, setIsMyTurn } from "../../store/reducers/room";
 
 const Board = () => {
   const dispatch = useAppDispatch();
@@ -106,33 +106,51 @@ const Board = () => {
     }
   };
 
+  const handleGameLeave = () => {
+    if (socketService.socket) {
+      gameService.onLeaveGame(socketService.socket, () => {
+        dispatch(setIsGameStarted(false));
+        setBoard([
+          { value: "" },
+          { value: "" },
+          { value: "" },
+          { value: "" },
+          { value: "" },
+          { value: "" },
+          { value: "" },
+          { value: "" },
+          { value: "" },
+        ]);
+      });
+    }
+  };
+
   useEffect(() => {
     handleGameUpdate();
     handleGameWon();
+    handleGameLeave();
   }, []);
 
   return (
-    <Box>
-      <Grid
-        container
-        rowSpacing={{ xs: 0 }}
-        columnSpacing={{ xs: 0 }}
-        sx={{
-          width: "300px",
-          height: "300px",
-        }}
-      >
-        {board.map((board, index) => (
-          <Grid item xs={4} key={`board-cell-${index}`}>
-            <Square
-              value={board.value}
-              index={index}
-              onSquareClick={updateGame}
-            />
-          </Grid>
-        ))}
-      </Grid>
-    </Box>
+    <Grid
+      container
+      rowSpacing={{ xs: 0 }}
+      columnSpacing={{ xs: 0 }}
+      sx={{
+        width: "400px",
+        height: "400px",
+      }}
+    >
+      {board.map((board, index) => (
+        <Grid item xs={4} key={`board-cell-${index}`}>
+          <Square
+            value={board.value}
+            index={index}
+            onSquareClick={updateGame}
+          />
+        </Grid>
+      ))}
+    </Grid>
   );
 };
 

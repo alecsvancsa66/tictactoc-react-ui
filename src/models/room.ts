@@ -13,4 +13,5 @@ export interface IRoomState {
   playerSymbol: "x" | "o" | undefined;
   isMyTurn: boolean;
   isGameStarted: boolean;
+  roomPassword: string | undefined;
 }

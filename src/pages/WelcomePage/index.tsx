@@ -2,8 +2,9 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, Button, TextField } from "@mui/material";
 
-import socketService from "../services/socketService";
-import gameService from "../services/gameService";
+import socketService from "../../services/socketService";
+import gameService from "../../services/gameService";
+import { Container } from "./styles";
 
 const WelcomePage = () => {
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ const WelcomePage = () => {
 
     try {
       await gameService.JoinRoom(socket, roomPassword);
-      //   localStorage.setItem("roomPassword", roomPassword);
+      localStorage.setItem("roomPassword", roomPassword);
       setLoading(false);
       navigate("/board");
     } catch (err) {
@@ -26,15 +27,7 @@ const WelcomePage = () => {
   };
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        flexDirection: "column",
-        gap: "24px",
-      }}
-    >
+    <Container>
       <Box>Welcome to tic tac toe!</Box>
       <TextField
         id="standard-basic"
@@ -53,7 +46,7 @@ const WelcomePage = () => {
       >
         {loading ? "Loading..." : "Start"}
       </Button>
-    </Box>
+    </Container>
   );
 };
 

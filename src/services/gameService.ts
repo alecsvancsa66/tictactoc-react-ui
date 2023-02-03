@@ -32,6 +32,14 @@ class GameService {
   public async onGameWon(socket: Socket, listener: (message: string) => void) {
     socket.on("on_game_won", ({ message }) => listener(message));
   }
+
+  public async leaveGame(socket: Socket) {
+    socket.emit("leave_game");
+  }
+
+  public async onLeaveGame(socket: Socket, listener: () => void) {
+    socket.on("on_leave_game", listener);
+  }
 }
 
 export default new GameService();

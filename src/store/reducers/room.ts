@@ -5,6 +5,7 @@ const initialState: IRoomState = {
   playerSymbol: "x",
   isMyTurn: false,
   isGameStarted: false,
+  roomPassword: undefined,
 };
 
 const roomSlice = createSlice({
@@ -23,11 +24,19 @@ const roomSlice = createSlice({
       ...state,
       isGameStarted: action.payload,
     }),
+    setRoomPassword: (state, action: PayloadAction<string>) => ({
+      ...state,
+      roomPassword: action.payload,
+    }),
   },
 });
 
 // actions
-export const { setPlayerSymbol, setIsMyTurn, setIsGameStarted } =
-  roomSlice.actions;
+export const {
+  setPlayerSymbol,
+  setIsMyTurn,
+  setIsGameStarted,
+  setRoomPassword,
+} = roomSlice.actions;
 
 export default roomSlice.reducer;
